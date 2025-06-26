@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="text-center mb-4">📈 Data Science Salary Prediction</h2>
+  <div class="card shadow p-4">
+    <form action="/analyze" method="post" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="file" class="form-label">Upload CSV Dataset</label>
+        <input class="form-control" type="file" name="file" id="file" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Run Analysis</button>
+    </form>
+  </div>
+
+  <div class="card shadow p-4 mt-5">
+    <h4 class="mb-3">🔮 Predict New Salary</h4>
+    <form id="predictForm">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label>Experience Level</label>
+          <select class="form-select" name="experience_level">
+            <option value="EN">Entry</option>
+            <option value="MI">Mid</option>
+            <option value="SE">Senior</option>
+            <option value="EX">Executive</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label>Job Title</label>
+          <input class="form-control" name="job_title" placeholder="e.g., Data Scientist" required>
+        </div>
+        <div class="col-md-4">
+          <label>Employee Residence</label>
+          <input class="form-control" name="employee_residence" placeholder="e.g., US" required>
+        </div>
+        <div class="col-md-4">
+          <label>Company Location</label>
+          <input class="form-control" name="company_location" placeholder="e.g., US" required>
+        </div>
+        <div class="col-md-4">
+          <label>Company Size</label>
+          <select class="form-select" name="company_size">
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label>Remote Ratio (%)</label>
+          <input class="form-control" name="remote_ratio" type="number" min="0" max="100" required>
+        </div>
+        <div class="col-md-4">
+          <label>Employment Type</label>
+          <select class="form-select" name="employment_type">
+            <option value="FT">Full-time</option>
+            <option value="PT">Part-time</option>
+            <option value="CT">Contract</option>
+            <option value="FL">Freelance</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-success mt-3" type="submit">Predict</button>
+    </form>
+
+    <div class="alert alert-info mt-4 d-none" id="predictionOutput"></div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('predictForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const data = [{}];
+    for (const [key, value] of formData.entries()) {
+      data[0][key] = value;
+    }
+    const response = await fetch('/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    const output = document.getElementById('predictionOutput');
+    output.textContent = 'Predicted Salary: ' + result.predictions[0];
+    output.classList.remove('d-none');
+  });
+</script>
+{% endblock %}
