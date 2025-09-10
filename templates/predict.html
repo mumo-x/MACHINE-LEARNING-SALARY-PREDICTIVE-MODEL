@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="static/styles.css" />
+    <title>Salary Predictor</title>
+    <style>
+        body { background: linear-gradient(135deg, #12172b, #1e1f3e); min-height: 100vh; }
+        .predict-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .predict-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #00e5ff;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group label i {
+            margin-right: 8px;
+            color: #00e5ff;
+        }
+        .form-group select {
+            padding: 15px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            background: #2c3e50;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+        .form-group select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+        .form-group select:focus {
+            outline: none;
+            border-color: #00e5ff;
+            box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        .button-group {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 18px 35px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00e5ff, #0099cc);
+            color: #000;
+            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 229, 255, 0.4);
+            background: linear-gradient(135deg, #00d4ff, #0077aa);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff5e62, #ff9966);
+            color: #000;
+            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.3);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 94, 98, 0.4);
+            background: linear-gradient(135deg, #ff4d52, #ff8856);
+        }
+        .result-card {
+            background: linear-gradient(135deg, #00e5ff, #0099cc);
+            color: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 15px 35px rgba(0, 229, 255, 0.3);
+            font-weight: 700;
+        }
+        .result-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            opacity: 0.95;
+            font-weight: 600;
+        }
+        .result-amount {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .error-card {
+            background: linear-gradient(135deg, #ff5e62, #ff9966);
+            color: #000;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(255, 94, 98, 0.3);
+            font-weight: 600;
+        }
+        header h1 {
+            color: #fff;
+            font-size: 3rem;
+            font-weight: 800;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+        header h1 i {
+            margin-right: 15px;
+            color: #00e5ff;
+        }
+        header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        @media (max-width: 768px) {
+            .predict-form {
+                grid-template-columns: 1fr;
+            }
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <h1><i class="fas fa-dollar-sign"></i> Salary Predictor</h1>
+            <p><i class="fas fa-robot"></i> Enter your details to get an AI-powered salary prediction</p>
+        </header>
+        
+        <div class="card predict-container">
+            <form id="predict-form" method="POST" action="/predict" class="predict-form">
+                <div class="form-group">
+                    <label for="experience_level"><i class="fas fa-chart-line"></i> Experience Level</label>
+                    <select id="experience_level" name="experience_level" required>
+                        <option value="">Choose your level</option>
+                        <option value="Entry" {% if form_data and form_data.experience_level == 'Entry' %}selected{% endif %}>Entry Level</option>
+                        <option value="Mid" {% if form_data and form_data.experience_level == 'Mid' %}selected{% endif %}>Mid Level</option>
+                        <option value="Senior" {% if form_data and form_data.experience_level == 'Senior' %}selected{% endif %}>Senior Level</option>
+                        <option value="Executive" {% if form_data and form_data.experience_level == 'Executive' %}selected{% endif %}>Executive Level</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="employment_type"><i class="fas fa-briefcase"></i> Employment Type</label>
+                    <select id="employment_type" name="employment_type" required>
+                        <option value="">Select employment type</option>
+                        <option value="Full-time" {% if form_data and form_data.employment_type == 'Full-time' %}selected{% endif %}>Full-time</option>
+                        <option value="Part-time" {% if form_data and form_data.employment_type == 'Part-time' %}selected{% endif %}>Part-time</option>
+                        <option value="Contract" {% if form_data and form_data.employment_type == 'Contract' %}selected{% endif %}>Contract</option>
+                        <option value="Freelance" {% if form_data and form_data.employment_type == 'Freelance' %}selected{% endif %}>Freelance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="job_title"><i class="fas fa-user-tie"></i> Job Title</label>
+                    <select id="job_title" name="job_title" required>
+                        <option value="">Select your role</option>
+                        <option value="Data Scientist" {% if form_data and form_data.job_title == 'Data Scientist' %}selected{% endif %}>Data Scientist</option>
+                        <option value="Machine Learning Engineer" {% if form_data and form_data.job_title == 'Machine Learning Engineer' %}selected{% endif %}>ML Engineer</option>
+                        <option value="Analytics Engineer" {% if form_data and form_data.job_title == 'Analytics Engineer' %}selected{% endif %}>Analytics Engineer</option>
+                        <option value="Data Science Manager" {% if form_data and form_data.job_title == 'Data Science Manager' %}selected{% endif %}>Data Science Manager</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="employee_residence"><i class="fas fa-map-marker-alt"></i> Your Location</label>
+                    <select id="employee_residence" name="employee_residence" required>
+                        <option value="">Where do you live?</option>
+                        <option value="US" {% if form_data and form_data.employee_residence == 'US' %}selected{% endif %}>United States</option>
+                        <option value="CA" {% if form_data and form_data.employee_residence == 'CA' %}selected{% endif %}>Canada</option>
+                        <option value="GB" {% if form_data and form_data.employee_residence == 'GB' %}selected{% endif %}>United Kingdom</option>
+                        <option value="AU" {% if form_data and form_data.employee_residence == 'AU' %}selected{% endif %}>Australia</option>
+                        <option value="NL" {% if form_data and form_data.employee_residence == 'NL' %}selected{% endif %}>Netherlands</option>
+                        <option value="LT" {% if form_data and form_data.employee_residence == 'LT' %}selected{% endif %}>Lithuania</option>
+                        <option value="DK" {% if form_data and form_data.employee_residence == 'DK' %}selected{% endif %}>Denmark</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="remote_ratio"><i class="fas fa-home"></i> Remote Work %</label>
+                    <select id="remote_ratio" name="remote_ratio" required>
+                        <option value="">Remote work percentage</option>
+                        <option value="0" {% if form_data and form_data.remote_ratio == '0' %}selected{% endif %}>0% - Fully On-site</option>
+                        <option value="50" {% if form_data and form_data.remote_ratio == '50' %}selected{% endif %}>50% - Hybrid</option>
+                        <option value="100" {% if form_data and form_data.remote_ratio == '100' %}selected{% endif %}>100% - Fully Remote</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="company_location"><i class="fas fa-building"></i> Company Location</label>
+                    <select id="company_location" name="company_location" required>
+                        <option value="">Company headquarters</option>
+                        <option value="US" {% if form_data and form_data.company_location == 'US' %}selected{% endif %}>United States</option>
+                        <option value="CA" {% if form_data and form_data.company_location == 'CA' %}selected{% endif %}>Canada</option>
+                        <option value="GB" {% if form_data and form_data.company_location == 'GB' %}selected{% endif %}>United Kingdom</option>
+                        <option value="AU" {% if form_data and form_data.company_location == 'AU' %}selected{% endif %}>Australia</option>
+                        <option value="NL" {% if form_data and form_data.company_location == 'NL' %}selected{% endif %}>Netherlands</option>
+                        <option value="LT" {% if form_data and form_data.company_location == 'LT' %}selected{% endif %}>Lithuania</option>
+                        <option value="DK" {% if form_data and form_data.company_location == 'DK' %}selected{% endif %}>Denmark</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="company_size"><i class="fas fa-users"></i> Company Size</label>
+                    <select id="company_size" name="company_size" required>
+                        <option value="">Select company size</option>
+                        <option value="S" {% if form_data and form_data.company_size == 'S' %}selected{% endif %}>Small (< 50 employees)</option>
+                        <option value="M" {% if form_data and form_data.company_size == 'M' %}selected{% endif %}>Medium (50-250 employees)</option>
+                        <option value="L" {% if form_data and form_data.company_size == 'L' %}selected{% endif %}>Large (250+ employees)</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-magic"></i> Predict Salary</button>
+                    <button type="button" class="btn btn-secondary" id="back-button"><i class="fas fa-arrow-left"></i> Back to Home</button>
+                </div>
+            </form>
+            
+            {% if error %}
+            <div class="error-card">
+                <strong><i class="fas fa-exclamation-triangle"></i> Error:</strong> {{ error }}
+            </div>
+            {% endif %}
+            
+            {% if predicted_salary %}
+            <div class="result-card">
+                <div class="result-title"><i class="fas fa-trophy"></i> Predicted Annual Salary</div>
+                <div class="result-amount">{{ predicted_salary }}</div>
+                <p style="margin-top: 15px; opacity: 0.9; font-size: 14px; color: #fff;">Based on AI analysis of market data</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('back-button').addEventListener('click', function() {
+            sessionStorage.setItem('returnFromPredict', 'true');
+            window.location.href = '/';
+        });
+        
+        // Add form validation feedback
+        document.getElementById('predict-form').addEventListener('submit', function(e) {
+            const selects = this.querySelectorAll('select');
+            let allFilled = true;
+            
+            selects.forEach(select => {
+                if (!select.value) {
+                    select.style.borderColor = '#ff5252';
+                    allFilled = false;
+                } else {
+                    select.style.borderColor = '#4caf50';
+                }
+            });
+            
+            if (!allFilled) {
+                e.preventDefault();
+                alert('Please fill in all fields before predicting!');
+            }
+        });
+    </script>
+</body>
+</html>
